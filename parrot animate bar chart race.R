@@ -1,4 +1,4 @@
-#bar chart race 
+#bar chart race
 library(tidyverse)
 library(hrbrthemes)
 library(gganimate)
@@ -12,31 +12,31 @@ library(readxl)
 # https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da
 
 # import data
-demand <- read_xlsx('bar_chart_race_parrot_analytics/US Demand Parrot Analytics.xlsx')
+demand <- read_xlsx('US Demand Parrot Analytics.xlsx')
 
 # wrangle data in ranks
-graph_data <- demand %>% 
-  group_by(Week) %>% 
+graph_data <- demand %>%
+  group_by(Week) %>%
   mutate(rank = rank(-demand_expressions),
          Value_rel = demand_expressions/demand_expressions[rank==1],
-         Value_lbl = paste0(" ",round(demand_expressions/1e6))) %>% 
+         Value_lbl = paste0(" ",round(demand_expressions/1e6))) %>%
   ungroup()
-  
-  
+
+
 
 #Create Static Bar Chart
 
-staticplot = ggplot(graph_data, 
-            aes(rank, group = Show, 
+staticplot = ggplot(graph_data,
+            aes(rank, group = Show,
              fill = as.factor(Show), color = NULL)) +
   geom_tile(aes(y = demand_expressions/2,
                 height = demand_expressions,
                 width = 0.9), alpha = 0.7, color = NA) +
-  geom_text(aes(label = paste(" ", Show), y = demand_expressions), 
-            color = 'black', 
-            hjust = "right", fontface = 'bold', 
+  geom_text(aes(label = paste(" ", Show), y = demand_expressions),
+            color = 'black',
+            hjust = "right", fontface = 'bold',
             size = 12) +
-  geom_text(aes(y=demand_expressions, label = Value_lbl), 
+  geom_text(aes(y=demand_expressions, label = Value_lbl),
                 hjust='left', nudge_y = 10,
             color= 'black',
             size = 10) +
@@ -66,19 +66,19 @@ staticplot = ggplot(graph_data,
 
 
 # Now animate
-anim = staticplot + 
+anim = staticplot +
   transition_states(Week, wrap = FALSE,
     transition_length = 4, state_length = 2) +
   view_follow(fixed_x = TRUE)  +
   labs(title = '2019 Was The Year of Game of Thrones and Stranger Things \nWeek : {closest_state}',
        subtitle = 'Data from Parrot Analytics',
-       caption  = "US Demand Expressions in Millions")  + 
+       caption  = "US Demand Expressions in Millions")  +
   ease_aes('cubic-in-out') +
   enter_fade() +
   exit_shrink()
 
 #render
-animate(anim, nframes = 318, fps = 20,  
+animate(anim, nframes = 318, fps = 20,
         width = 1200, height = 900,
-        start_pause = 10, end_pause = 10,
+        start_pause = 10, end_pause = 23,
         renderer = gifski_renderer("gganim.gif"))
